@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: edupaper-backend
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/edupaper?useSSL=false&serverTimezone=Asia/Kolkata
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+
+jwt :
+  secret : kk1ghSynntc7i1gidcksACT2xR/J6jK7IPTh2ysj45Go=
+  expiration : 86400000
