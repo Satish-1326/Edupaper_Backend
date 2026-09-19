@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 
 @Entity
 @Table(name = "users")
@@ -52,4 +55,13 @@ public class User {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    @OneToMany(
+            mappedBy = "createdBy",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @Builder.Default
+//    private List<Blueprint> blueprints = new ArrayList<>();
+    private List<Paper> papers = new ArrayList<>();
 }

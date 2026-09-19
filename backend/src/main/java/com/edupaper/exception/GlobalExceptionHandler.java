@@ -87,4 +87,18 @@ public class GlobalExceptionHandler {
                 .status(status)
                 .body(response);
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Map<String, Object>> handleBadRequest(
+            BadRequestException ex
+    ){
+        Map<String , Object> response = new HashMap<>();
+
+        response.put("status", 400);
+        response.put("error", "Bad Request");
+        response.put("message" , ex.getMessage());
+        response.put("timestamp" , LocalDateTime.now());
+
+        return ResponseEntity.badRequest().body(response);
+    }
 }

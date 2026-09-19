@@ -8,73 +8,67 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "blueprints")
+@Table(name = "papers")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Blueprint {
+public class Paper {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @Column(nullable = false)
     private String name;
-
-
-    @Column(length = 2000)
-    private String description;
-
-
-    @Column(nullable = false)
-    private Integer totalQuestions;
-
-
-    @Column(nullable = false)
-    private Integer totalMarks;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "blueprint_id", nullable = false)
+    private Blueprint blueprint;
+
+    @Column(nullable = false)
+    private Integer totalQuestions;
+
+    @Column(nullable = false)
+    private Integer totalMarks;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaperStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 
-
-
-
-
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
-
-    @PrePersist
-    protected void onCreate() {
-
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-
-    @PreUpdate
-    protected void onUpdate() {
-
-        updatedAt = LocalDateTime.now();
-    }
-
     @OneToMany(
-            mappedBy = "blueprint",
+            mappedBy = "paper",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     @Builder.Default
-    private List<BlueprintConstraint> constraint = new ArrayList<>();
+    private List<PaperQuestion> questions = new ArrayList<>();
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+
+        if (status == null) {
+            status = PaperStatus.DRAFT;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

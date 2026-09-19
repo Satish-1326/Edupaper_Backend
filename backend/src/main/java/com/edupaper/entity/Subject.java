@@ -83,6 +83,8 @@ public class Subject{
             orphanRemoval = true
     )
     @Builder.Default
-    private List<Question> questions = new ArrayList<>();
+//    private List<Question> questions = new ArrayList<>();
+//    private List<Blueprint> blueprints = new ArrayList<>();
+    private List<Paper> papers = new ArrayList<>();
 }
 

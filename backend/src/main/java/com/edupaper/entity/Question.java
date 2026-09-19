@@ -114,9 +114,9 @@ public class Question {
 
     @PreUpdate
     protected void onUpdate() {
-
         updatedAt = LocalDateTime.now();
     }
+
     @OneToMany(
             mappedBy = "question",
             cascade = CascadeType.ALL,
@@ -124,4 +124,13 @@ public class Question {
     )
     @Builder.Default
     private List<QuestionOption> options = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "question",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @Builder.Default
+    private List<PaperQuestion> paperQuestions = new ArrayList<>();
+
 }
