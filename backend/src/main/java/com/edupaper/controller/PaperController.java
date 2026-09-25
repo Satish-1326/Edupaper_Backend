@@ -1,8 +1,8 @@
 package com.edupaper.controller;
 
-import com.edupaper.dto.paper.GeneratePaperRequest;
-import com.edupaper.dto.paper.PaperResponse;
+import com.edupaper.dto.paper.*;
 import com.edupaper.entity.User;
+import com.edupaper.exception.ResourceNotFoundException;
 import com.edupaper.repository.UserRepository;
 import com.edupaper.service.PaperService;
 
@@ -136,5 +136,123 @@ public class PaperController {
                                 ));
 
         return user.getId();
+    }
+    @DeleteMapping("/papers/{paperId}/questions/{questionId}")
+    public ResponseEntity<RemovePaperQuestionResponse> removeQuestion(
+            @PathVariable Long paperId,
+            @PathVariable Long questionId,
+            Authentication authentication) {
+
+        User currentUser =
+                userRepository
+                        .findByEmail(authentication.getName())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "User not found"
+                                )
+                        );
+
+        RemovePaperQuestionResponse response =
+                paperService.removeQuestion(
+                        paperId,
+                        questionId,
+                        currentUser
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
+    // =========================
+// ADD QUESTION TO PAPER
+// =========================
+
+    @PostMapping("/papers/{paperId}/questions")
+    public ResponseEntity<AddPaperQuestionResponse> addQuestion(
+            @PathVariable Long paperId,
+            @Valid @RequestBody AddPaperQuestionRequest request,
+            Authentication authentication) {
+
+        Long userId =
+                getCurrentUserId(authentication);
+
+        AddPaperQuestionResponse response =
+                paperService.addQuestion(
+                        paperId,
+                        request.getQuestionId(),
+                        userId
+                );
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
+    // =========================
+// REPLACE QUESTION IN PAPER
+// =========================
+
+    @PutMapping("/papers/{paperId}/questions/{oldQuestionId}")
+    public ResponseEntity<ReplacePaperQuestionResponse> replaceQuestion(
+            @PathVariable Long paperId,
+            @PathVariable Long oldQuestionId,
+            @Valid @RequestBody ReplacePaperQuestionRequest request,
+            Authentication authentication) {
+
+        Long userId =
+                getCurrentUserId(authentication);
+
+        ReplacePaperQuestionResponse response =
+                paperService.replaceQuestion(
+                        paperId,
+                        oldQuestionId,
+                        request.getNewQuestionId(),
+                        userId
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
+    // =========================
+// REORDER PAPER QUESTIONS
+// =========================
+
+    @PutMapping("/papers/{paperId}/questions/order")
+    public ResponseEntity<ReorderPaperQuestionsResponse> reorderQuestions(
+            @PathVariable Long paperId,
+            @Valid @RequestBody ReorderPaperQuestionsRequest request,
+            Authentication authentication) {
+
+        Long userId =
+                getCurrentUserId(authentication);
+
+        ReorderPaperQuestionsResponse response =
+                paperService.reorderQuestions(
+                        paperId,
+                        request.getQuestionIds(),
+                        userId
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
+    // =========================
+// FINALIZE PAPER
+// =========================
+
+    @PutMapping("/papers/{paperId}/finalize")
+    public ResponseEntity<PaperResponse> finalizePaper(
+            @PathVariable Long paperId,
+            Authentication authentication) {
+
+        Long userId =
+                getCurrentUserId(authentication);
+
+        PaperResponse response =
+                paperService.finalizePaper(
+                        paperId,
+                        userId
+                );
+
+        return ResponseEntity.ok(response);
     }
 }
