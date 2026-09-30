@@ -6,6 +6,7 @@ import com.edupaper.exception.ResourceNotFoundException;
 import com.edupaper.repository.UserRepository;
 import com.edupaper.service.PaperService;
 
+import com.edupaper.service.PdfGenerationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -13,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import com.edupaper.service.PdfGenerationService;
 
 import java.util.List;
 
@@ -23,6 +26,8 @@ public class PaperController {
 
     private final PaperService paperService;
     private final UserRepository userRepository;
+
+    private final PdfGenerationService pdfGenerationService;
 
     // =========================
     // GENERATE PAPER
@@ -254,5 +259,38 @@ public class PaperController {
                 );
 
         return ResponseEntity.ok(response);
+    }
+
+    // =========================
+// DOWNLOAD QUESTION PAPER PDF
+// =========================
+
+    @GetMapping("/papers/{paperId}/pdf")
+    public ResponseEntity<byte[]> downloadQuestionPaperPdf(
+            @PathVariable Long paperId,
+            Authentication authentication) {
+
+        Long userId =
+                getCurrentUserId(authentication);
+
+        byte[] pdf =
+                pdfGenerationService
+                        .generateQuestionPaperPdf(
+                                paperId,
+                                userId
+                        );
+
+        return ResponseEntity.ok()
+                .header(
+                        "Content-Disposition",
+                        "attachment; filename=\"paper-"
+                                + paperId
+                                + ".pdf\""
+                )
+                .header(
+                        "Content-Type",
+                        "application/pdf"
+                )
+                .body(pdf);
     }
 }
